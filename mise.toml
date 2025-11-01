@@ -1,6 +1,6 @@
 [tasks.dev]
 description = "Run the application in development mode"
-run = "echo 'Replace this with your command like go run ./cmd/your-cli'"
+run = "go run ./cmd/memo"
 
 [tasks.lint]
 description = "Run golangci-lint"
