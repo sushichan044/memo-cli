@@ -32,9 +32,26 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Get GitHub App User ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - run: |
+          git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+
       - uses: Songmu/tagpr@7191605433b03e11b313dbbc0efb80185170de4b # v1.9.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       # tagpr guess version from label, but we need to guess it from conventional commit.
       - name: Get next version from svu
@@ -47,8 +64,8 @@ jobs:
           fi
           echo "next=$next_version" >> "$GITHUB_OUTPUT"
 
-      - name: Switch to PR
-        id: switch-to-pr
+      - name: Get PR branch
+        id: get-pr-branch
         run: |
           # Stash including untracked files to prevent "would be overwritten by checkout" errors
           git stash push -u -m "pre-switch-to-pr" || true
@@ -60,38 +77,34 @@ jobs:
             exit 0
           fi
 
-          # Try checkout to the PR branch; if it still fails for some reason, show diagnostics
-          if ! gh pr checkout "$PR_NUMBER"; then
-            echo "::error::Failed to checkout PR #$PR_NUMBER"
-            git status --porcelain || true
-            exit 1
-          fi
+          PR_BRANCH=$(gh pr view "$PR_NUMBER" --json headRefName --jq '.headRefName')
 
           echo "should-continue=true" >> "$GITHUB_OUTPUT"
           echo "pr-number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "pr-branch=$PR_BRANCH" >> "$GITHUB_OUTPUT"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Edit version file
-        if: steps.switch-to-pr.outputs.should-continue == 'true'
+        if: steps.get-pr-branch.outputs.should-continue == 'true'
         run: |
           sed -i "s/Version = \".*\"/Version = \"${{ steps.svu.outputs.next }}\"/" version/version.go
 
       - name: Commit and push changes
         id: commit-and-push
-        if: steps.switch-to-pr.outputs.should-continue == 'true'
+        if: steps.get-pr-branch.outputs.should-continue == 'true'
         uses: suzuki-shunsuke/commit-action@b4aee3f297a855b761e0db5736a73566a7807fe2 # v0.0.11
         with:
-          app_id: ${{ secrets.APP_ID }}
-          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          branch: ${{ steps.get-pr-branch.outputs.pr-branch }}
           files: |
             version/version.go
           commit_message: "chore: bump version to v${{ steps.svu.outputs.next }}"
           fail_on_self_push: false # push to current PR branch
+          github_token: ${{ steps.app-token.outputs.token }}
 
       - name: Modify PR body
-        if: steps.switch-to-pr.outputs.should-continue == 'true' && steps.commit-and-push.outputs.pushed == 'true'
+        if: steps.get-pr-branch.outputs.should-continue == 'true' && steps.commit-and-push.outputs.pushed == 'true'
         run: |
-          gh pr edit "${{ steps.switch-to-pr.outputs.pr-number }}" --title "Release for v${{ steps.svu.outputs.next }}"
+          gh pr edit "${{ steps.get-pr-branch.outputs.pr-number }}" --title "Release for v${{ steps.svu.outputs.next }}"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
