@@ -93,3 +93,5 @@ jobs:
         if: steps.switch-to-pr.outputs.should-continue == 'true' && steps.commit-and-push.outputs.pushed == 'true'
         run: |
           gh pr edit "${{ steps.switch-to-pr.outputs.pr-number }}" --title "Release for v${{ steps.svu.outputs.next }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
