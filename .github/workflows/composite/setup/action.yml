@@ -1,0 +1,22 @@
+name: "Setup Go"
+description: |
+  Sets up the Go environment for tests, builds, etc.
+inputs:
+  go-version-file:
+    description: "The path to the Go version file."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+      with:
+        go-version-file: ${{ inputs.go-version-file }}
+
+    - name: Install gotestsum
+      shell: bash
+      run: go install gotest.tools/gotestsum@latest
+
+    - name: go mod download
+      shell: bash
+      run: go mod download -x

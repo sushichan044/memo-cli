@@ -7,36 +7,22 @@ before:
     - go generate ./...
 
 builds:
-  - id: memo
-    main: ./cmd/memo
-    binary: memo
+  - main: ./cmd/mdfm
+    id: mdfm
+    binary: mdfm
     env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
-    goarch:
-      - amd64
-      - arm64
-      - "386"
-      - arm
-    goarm:
-      - "6"
-      - "7"
-    ignore:
-      - goos: darwin
-        goarch: "386"
-      - goos: darwin
-        goarch: arm
-      - goos: windows
-        goarch: arm
-      - goos: windows
-        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.revision={{.ShortCommit}}
 
 archives:
-  - id: memo
-    format: tar.gz
+  - formats: [tar.gz]
+    # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -44,9 +30,10 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 checksum:
   name_template: "checksums.txt"
@@ -61,8 +48,12 @@ changelog:
       - "^ci:"
 
 release:
+  use_existing_draft: true
   github:
     owner: sushichan044
     name: memo-cli
-  draft: false
-  prerelease: auto
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
