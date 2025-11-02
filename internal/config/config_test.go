@@ -8,25 +8,7 @@ import (
 	"github.com/sushichan044/memo-cli/internal/config"
 )
 
-func TestNew_WithEnvVar(t *testing.T) {
-	// Set environment variable
-	testDir := "/tmp/test-memo"
-	t.Setenv(config.EnvMemoBaseDir, testDir)
-
-	cfg, err := config.New()
-	if err != nil {
-		t.Fatalf("New() failed: %v", err)
-	}
-
-	if cfg.BaseDir != testDir {
-		t.Errorf("BaseDir = %q, want %q", cfg.BaseDir, testDir)
-	}
-}
-
-func TestNew_WithoutEnvVar(t *testing.T) {
-	// Unset environment variable
-	t.Setenv(config.EnvMemoBaseDir, "")
-
+func TestNew(t *testing.T) {
 	cfg, err := config.New()
 	if err != nil {
 		t.Fatalf("New() failed: %v", err)
@@ -85,9 +67,6 @@ func TestGetIgnorePattern(t *testing.T) {
 }
 
 func TestGetUsernameOrDefault(t *testing.T) {
-	// Note: getUsernameOrDefault is unexported, so we test it indirectly through New()
-	t.Setenv(config.EnvMemoBaseDir, "")
-
 	cfg, err := config.New()
 	if err != nil {
 		t.Fatalf("New() failed: %v", err)
@@ -110,9 +89,6 @@ func TestNew_Integration(t *testing.T) {
 
 	// Change to temporary directory
 	t.Chdir(tmpDir)
-
-	// Unset environment variable
-	t.Setenv(config.EnvMemoBaseDir, "")
 
 	cfg, err := config.New()
 	if err != nil {

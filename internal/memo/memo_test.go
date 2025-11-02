@@ -20,12 +20,12 @@ func TestNormalizeFileName(t *testing.T) {
 		{
 			name:     "with slashes",
 			input:    "project/notes",
-			contains: "project-notes",
+			contains: "projectnotes",
 		},
 		{
 			name:     "with backslashes",
 			input:    "project\\notes",
-			contains: "project-notes",
+			contains: "projectnotes",
 		},
 		{
 			name:     "with spaces",

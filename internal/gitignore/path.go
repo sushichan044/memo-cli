@@ -19,9 +19,9 @@ func getGlobalGitIgnorePath() (string, error) {
 	if val != "" {
 		// TODO: resolve ~/ to home directory
 		if val[:2] == "~/" {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return "", err
+			home, homeErr := os.UserHomeDir()
+			if homeErr != nil {
+				return "", homeErr
 			}
 			val = filepath.Join(home, val[2:])
 		}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/pathologize"
@@ -32,7 +33,7 @@ func (c *Creator) Create(name string) (string, error) {
 	}
 
 	// Generate filename
-	filename := c.generateFilename(name)
+	filename := normalizeFileName(c.generateFilename(name))
 
 	// Create date directory (YYYYMMDD)
 	now := time.Now()
@@ -99,4 +100,16 @@ func (c *Creator) CheckGitignore() string {
 			"    %s",
 		pattern,
 	)
+}
+
+func normalizeFileName(name string) string {
+	normalized := name
+
+	rep := strings.NewReplacer(
+		" ", "-",
+		// add more replacements if needed
+	)
+	normalized = rep.Replace(normalized)
+
+	return normalized
 }

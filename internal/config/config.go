@@ -7,11 +7,8 @@ import (
 )
 
 const (
-	// EnvMemoBaseDir is the environment variable name for the memo base directory.
-	EnvMemoBaseDir = "MEMO_BASE_DIR"
-
-	// defaultMemoDirName is the default directory name when username cannot be determined.
-	defaultMemoDirName = "memo"
+	// fallbackMemoDir is the default directory name when username cannot be determined.
+	fallbackMemoDir = "memo"
 )
 
 // Config holds the configuration for the memo CLI.
@@ -35,11 +32,6 @@ func New() (*Config, error) {
 }
 
 func getBaseDir() (string, error) {
-	fromEnv := os.Getenv(EnvMemoBaseDir)
-	if fromEnv != "" {
-		return fromEnv, nil
-	}
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -54,7 +46,7 @@ func getBaseDir() (string, error) {
 func getUsernameOrDefault() string {
 	currentUser, err := user.Current()
 	if err != nil || currentUser.Username == "" {
-		return defaultMemoDirName
+		return fallbackMemoDir
 	}
 	return currentUser.Username
 }

@@ -11,13 +11,20 @@ import (
 	"github.com/sushichan044/memo-cli/version"
 )
 
-type CLIContext struct {
-	cfg *config.Config
-}
+type (
+	CLIContext struct {
+		cfg *config.Config
+	}
 
-type NewCmd struct {
-	Name string `arg:"" optional:"" help:"Memo name (default: timestamp HH-MM-SS)"`
-}
+	CLI struct {
+		New NewCmd `cmd:"new" help:"Create a new memo."`
+		// List ListCmd `cmd:"list" help:"List all memos."` TODO: add go-fzf integration
+	}
+
+	NewCmd struct {
+		Name string `arg:"" optional:"" help:"Memo name (default: timestamp HH-MM-SS)"`
+	}
+)
 
 func (c *NewCmd) Run(ctx *CLIContext) error {
 	creator := memo.New(ctx.cfg)
@@ -41,11 +48,6 @@ func (c *NewCmd) Run(ctx *CLIContext) error {
 	fmt.Println(path) //nolint:forbidigo // stdout output is intentional for piping
 
 	return nil
-}
-
-type CLI struct {
-	New NewCmd `cmd:"new" help:"Create a new memo."`
-	// List ListCmd `cmd:"list" help:"List all memos."`
 }
 
 var (

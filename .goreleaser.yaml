@@ -66,16 +66,3 @@ release:
     name: memo-cli
   draft: false
   prerelease: auto
-
-brews:
-  - repository:
-      owner: sushichan044
-      name: homebrew-tap
-    directory: Formula
-    homepage: https://github.com/sushichan044/memo-cli
-    description: "A CLI tool to create and manage markdown memos"
-    license: MIT
-    test: |
-      system "#{bin}/memo --help"
-    install: |
-      bin.install "memo"
