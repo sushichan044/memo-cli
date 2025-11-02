@@ -87,6 +87,7 @@ jobs:
           files: |
             version/version.go
           commit_message: "chore: bump version to v${{ steps.svu.outputs.next }}"
+          fail_on_self_push: false # push to current PR branch
 
       - name: Modify PR body
         if: steps.switch-to-pr.outputs.should-continue == 'true' && steps.commit-and-push.outputs.pushed == 'true'
