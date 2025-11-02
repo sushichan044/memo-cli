@@ -54,9 +54,9 @@ $ memo "sprint-planning"
 # Pipe the path to open in editor
 $ vim "$(memo 'quick-note')"
 
-# Select from existing memos
-$ memo list
-# → Interactive fuzzy finder with preview
+# Select from existing memos (Coming Soon)
+# $ memo list
+# Interactive fuzzy finder with preview
 ```
 
 ## Gitignore Integration
@@ -69,8 +69,8 @@ To suppress the warning, add the memo directory to your `.gitignore`:
 # For user-specific memos (default)
 .sushichan044/memo/
 
-# Or for custom MEMO_BASE_DIR
-/path/to/your/custom/memos/
+# Or for custom MEMO_BASE_DIR (Planned Feature)
+# /path/to/your/custom/memos/
 ```
 
 ## Development

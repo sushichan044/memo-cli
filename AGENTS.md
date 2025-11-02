@@ -26,8 +26,8 @@ memo-cli/
 │   ├── memo/           # Memo creation logic
 │   │   ├── memo.go     # File creation, normalization, gitignore checking
 │   │   └── memo_test.go
-│   ├── ui/             # Interactive selection
-│   │   └── selector.go # Fuzzyfinder integration
+│   ├── xdg/            # XDG Base Directory specification support
+│   │   └── xdg.go      # User data directory resolution
 │   └── gitignore/      # Gitignore pattern matching
 │       ├── matcher.go  # Pattern matching engine
 │       └── path.go     # Path resolution for gitignore files
@@ -38,10 +38,45 @@ memo-cli/
 1. **Memo Creation**: Create markdown files with timestamp or custom names
 2. **Date Organization**: Automatic YYYYMMDD directory structure
 3. **Filename Normalization**: Safe filename generation (slash/space → dash, extension removal)
-4. **Interactive Selection**: Fuzzy finder (go-fuzzyfinder) with file preview
-5. **Gitignore Integration**: Checks if memo directory is ignored, shows helpful warnings
-6. **Environment Customization**: `MEMO_BASE_DIR` for custom base directory
-7. **Cross-platform**: Supports Linux, macOS, and Windows
+4. **Gitignore Integration**: Checks if memo directory is ignored, shows helpful warnings
+5. **Cross-platform**: Supports Linux, macOS, and Windows
+
+### Planned Features
+
+These features are planned for future implementation:
+
+1. **Interactive Selection** (`memo list` command)
+   - Fuzzy finder (go-fuzzyfinder) with file preview
+   - Browse and select from existing memos
+   - Real-time preview window showing memo content
+   - Implementation tracked in: `cmd/memo/main.go` (TODO comment)
+
+2. **Environment Customization**
+   - `MEMO_BASE_DIR` environment variable for custom base directory
+   - Flexible directory structure configuration
+   - Implementation tracked in: `internal/config/config.go` (TODO comment)
+
+3. **UI Package** (`internal/ui/`)
+   - Dedicated package for interactive selection features
+   - Fuzzyfinder integration and wrapper utilities
+   - Will be created when implementing the `memo list` command
+
+### Dependencies
+
+#### Core Dependencies
+
+- **github.com/alecthomas/kong** v1.12.1 - CLI parser with type-safe argument handling
+- **github.com/spf13/pathologize** - Filename normalization and path sanitization
+- **github.com/Songmu/gitconfig** v0.2.1 - Git configuration parsing
+- **github.com/sabhiram/go-gitignore** - Gitignore pattern matching engine
+
+#### Testing Dependencies
+
+- **github.com/stretchr/testify** v1.11.1 - Assertion library for unit tests
+
+#### Future Dependencies (Planned)
+
+- **github.com/ktr0731/go-fuzzyfinder** - Interactive fuzzy finder for `memo list` command
 
 ### Design Decisions
 
@@ -73,11 +108,6 @@ memo-cli/
 
 - **Decision**: kong (github.com/alecthomas/kong)
 - **Rationale**: Type-safe, minimal boilerplate, excellent help generation
-
-#### Interactive Selection
-
-- **Decision**: go-fuzzyfinder (github.com/ktr0731/go-fuzzyfinder)
-- **Rationale**: Pure Go implementation, no external dependencies, preview window support
 
 ---
 
