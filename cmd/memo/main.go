@@ -17,6 +17,8 @@ type (
 	}
 
 	CLI struct {
+		Version kong.VersionFlag `short:"v" help:"Show version."`
+
 		New NewCmd `cmd:"new" help:"Create a new memo."`
 		// List ListCmd `cmd:"list" help:"List all memos."` TODO: add go-fzf integration
 	}
