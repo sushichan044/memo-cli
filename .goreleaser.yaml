@@ -7,9 +7,9 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./cmd/mdfm
-    id: mdfm
-    binary: mdfm
+  - main: ./cmd/memo
+    id: memo
+    binary: memo
     env:
       - CGO_ENABLED=0
     goos:
