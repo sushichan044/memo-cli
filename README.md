@@ -5,29 +5,14 @@ A CLI tool to create and manage markdown memos with interactive selection and gi
 ## Features
 
 - 📝 Create markdown memos with custom names or timestamps
-- 🔍 Interactive memo selection with fuzzy finder (fzf-like interface)
 - 📂 Organized by date (YYYYMMDD directories)
 - ⚠️  Gitignore checking with helpful warnings
-- 🎨 Customizable via environment variables
-- 🚀 Cross-platform support (Linux, macOS, Windows)
 
 ## Installation
-
-### Homebrew (macOS/Linux)
-
-```bash
-brew install sushichan044/tap/memo-cli
-```
-
-### From Source
 
 ```bash
 go install github.com/sushichan044/memo-cli/cmd/memo@latest
 ```
-
-### Pre-built Binaries
-
-Download from [GitHub Releases](https://github.com/sushichan044/memo-cli/releases)
 
 ## Usage
 
@@ -42,32 +27,10 @@ memo "project-notes"
 memo "meeting/2024"
 ```
 
-### Select existing memo interactively
-
-```bash
-# Launch fuzzy finder to select a memo
-memo list
-```
-
-### Environment Variables
-
-#### `MEMO_BASE_DIR`
-
-Customize the base directory for memos.
-
-```bash
-# Use custom directory
-export MEMO_BASE_DIR="$HOME/Documents/memos"
-memo
-
-# Default: .{username}/memo in current directory
-# If username cannot be determined: .memo/memo
-```
-
 ### Directory Structure
 
 ```
-{MEMO_BASE_DIR}/
+.{$USER}/
 └── YYYYMMDD/           # Date folder (e.g., 20251031)
     ├── HH-MM-SS.md     # Timestamp memo
     └── custom-name.md  # Named memo
@@ -95,19 +58,6 @@ $ vim "$(memo 'quick-note')"
 $ memo list
 # → Interactive fuzzy finder with preview
 ```
-
-## Filename Normalization
-
-When creating named memos, the following transformations are applied:
-
-- Slashes (`/`) → Dashes (`-`)
-- Spaces (` `) → Dashes (`-`)
-- File extensions are removed (`.md` is automatically added)
-
-Examples:
-- `project/notes` → `project-notes.md`
-- `my meeting notes` → `my-meeting-notes.md`
-- `file.txt` → `file.md`
 
 ## Gitignore Integration
 
