@@ -79,10 +79,18 @@ func TestCreate_WithName(t *testing.T) {
 		t.Errorf("File %q does not exist", path)
 	}
 
-	// Check filename
+	// Check filename format (should be HH-MM-name.md)
 	filename := filepath.Base(path)
-	if filename != "test-memo.md" {
-		t.Errorf("Filename = %q, want %q", filename, "test-memo.md")
+	if !strings.HasSuffix(filename, "-test-memo.md") {
+		t.Errorf("Filename = %q, want format HH-MM-test-memo.md", filename)
+	}
+
+	// Check that timestamp prefix exists (HH-MM format)
+	nameWithoutExt := strings.TrimSuffix(filename, ".md")
+	parts := strings.SplitN(nameWithoutExt, "-", 3) // HH-MM-name
+	const expectedMinParts = 3                      // At least HH-MM-name
+	if len(parts) < expectedMinParts {
+		t.Errorf("Filename %q should have format HH-MM-name", nameWithoutExt)
 	}
 
 	// Check that file is under tmpDir
@@ -120,7 +128,7 @@ func TestCreate_WithoutName(t *testing.T) {
 		t.Errorf("File %q does not exist", path)
 	}
 
-	// Check filename format (should be HH-MM-SS.md)
+	// Check filename format (should be HH-MM.md)
 	filename := filepath.Base(path)
 	if !strings.HasSuffix(filename, ".md") {
 		t.Errorf("Filename %q should end with .md", filename)
@@ -129,11 +137,11 @@ func TestCreate_WithoutName(t *testing.T) {
 	// Remove .md extension
 	nameWithoutExt := strings.TrimSuffix(filename, ".md")
 
-	// Should be in format HH-MM-SS (8 characters with dashes)
+	// Should be in format HH-MM (5 characters with dash)
 	parts := strings.Split(nameWithoutExt, "-")
-	const expectedParts = 3 // HH-MM-SS
+	const expectedParts = 2 // HH-MM
 	if len(parts) != expectedParts {
-		t.Errorf("Timestamp filename %q should have format HH-MM-SS", nameWithoutExt)
+		t.Errorf("Timestamp filename %q should have format HH-MM", nameWithoutExt)
 	}
 }
 

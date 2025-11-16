@@ -58,18 +58,21 @@ func (c *Creator) Create(name string) (string, error) {
 }
 
 // generateFilename creates a normalized filename from user input.
-// If name is empty, uses timestamp (HH-MM-SS).
-// Otherwise, normalizes the name by:
+// All filenames are prefixed with timestamp (HH-MM).
+// If name is empty, uses only the timestamp.
+// Otherwise, generates "HH-MM-name" format by:
+// - Prefixing with timestamp.
 // - Removing extension if provided.
 // - Replacing slashes with dashes.
 // - Replacing spaces with dashes.
 func (c *Creator) generateFilename(name string) string {
+	timestamp := time.Now().Format("15-04")
 	if name == "" {
 		// Use timestamp as default
-		return time.Now().Format("15-04-05")
+		return timestamp
 	}
 
-	return pathologize.Clean(name)
+	return timestamp + "-" + pathologize.Clean(name)
 }
 
 // CheckGitignore checks if the memo base directory is ignored by git.
