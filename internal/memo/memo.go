@@ -64,12 +64,13 @@ func (c *Creator) Create(name string) (string, error) {
 // - Replacing slashes with dashes.
 // - Replacing spaces with dashes.
 func (c *Creator) generateFilename(name string) string {
+	timestamp := time.Now().Format("15-04-05")
 	if name == "" {
 		// Use timestamp as default
-		return time.Now().Format("15-04-05")
+		return timestamp
 	}
 
-	return pathologize.Clean(name)
+	return timestamp + "-" + pathologize.Clean(name)
 }
 
 // CheckGitignore checks if the memo base directory is ignored by git.

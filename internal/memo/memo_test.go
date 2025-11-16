@@ -79,10 +79,18 @@ func TestCreate_WithName(t *testing.T) {
 		t.Errorf("File %q does not exist", path)
 	}
 
-	// Check filename
+	// Check filename format (should be HH-MM-SS-test-memo.md)
 	filename := filepath.Base(path)
-	if filename != "test-memo.md" {
-		t.Errorf("Filename = %q, want %q", filename, "test-memo.md")
+	if !strings.HasSuffix(filename, "-test-memo.md") {
+		t.Errorf("Filename %q should end with -test-memo.md", filename)
+	}
+
+	// Verify timestamp prefix format (HH-MM-SS-)
+	nameWithoutSuffix := strings.TrimSuffix(filename, "-test-memo.md")
+	parts := strings.Split(nameWithoutSuffix, "-")
+	const expectedParts = 3 // HH-MM-SS
+	if len(parts) != expectedParts {
+		t.Errorf("Timestamp prefix %q should have format HH-MM-SS", nameWithoutSuffix)
 	}
 
 	// Check that file is under tmpDir
@@ -164,19 +172,42 @@ func TestCreate_DirectoryCreation(t *testing.T) {
 	}
 }
 
+// verifyTimestampPrefix checks that the first three parts of dash-separated name are 2-digit timestamps.
+func verifyTimestampPrefix(t *testing.T, parts []string) {
+	t.Helper()
+
+	if len(parts) < 3 {
+		t.Error("not enough parts for timestamp prefix")
+
+		return
+	}
+
+	for i := range 3 {
+		if len(parts[i]) != 2 {
+			t.Errorf("timestamp part %d %q should be 2 digits", i, parts[i])
+		}
+	}
+}
+
 func TestGenerateFilename(t *testing.T) {
 	// generateFilename is unexported, so we test it indirectly through Create()
 	tests := []struct {
-		name  string
-		input string
+		name           string
+		input          string
+		expectedSuffix string
+		minParts       int // minimum number of dash-separated parts (HH-MM-SS = 3, HH-MM-SS-name = 4+)
 	}{
 		{
-			name:  "with name",
-			input: "my-memo",
+			name:           "with name",
+			input:          "my-memo",
+			expectedSuffix: "-my-memo.md",
+			minParts:       4, // HH-MM-SS-my-memo
 		},
 		{
-			name:  "without name",
-			input: "",
+			name:           "without name",
+			input:          "",
+			expectedSuffix: ".md",
+			minParts:       3, // HH-MM-SS
 		},
 	}
 
@@ -197,10 +228,30 @@ func TestGenerateFilename(t *testing.T) {
 				t.Error("filename is empty")
 			}
 
+			// Should have expected suffix
+			if !strings.HasSuffix(filename, tt.expectedSuffix) {
+				t.Errorf("filename %q should have suffix %q", filename, tt.expectedSuffix)
+			}
+
 			// Should have .md extension
 			if !strings.HasSuffix(filename, ".md") {
 				t.Errorf("filename %q should have .md extension", filename)
 			}
+
+			// Verify timestamp is always present
+			nameWithoutExt := strings.TrimSuffix(filename, ".md")
+			parts := strings.Split(nameWithoutExt, "-")
+			if len(parts) < tt.minParts {
+				t.Errorf(
+					"filename %q should have at least %d dash-separated parts, got %d",
+					nameWithoutExt,
+					tt.minParts,
+					len(parts),
+				)
+			}
+
+			// First three parts should be timestamp (HH-MM-SS)
+			verifyTimestampPrefix(t, parts)
 		})
 	}
 }

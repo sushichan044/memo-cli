@@ -31,9 +31,9 @@ memo "meeting/2024"
 
 ```
 .{$USER}/
-└── YYYYMMDD/           # Date folder (e.g., 20251031)
-    ├── HH-MM-SS.md     # Timestamp memo
-    └── custom-name.md  # Named memo
+└── YYYYMMDD/                  # Date folder (e.g., 20251031)
+    ├── HH-MM-SS.md            # Timestamp memo (no name provided)
+    └── HH-MM-SS-custom-name.md  # Named memo (with timestamp prefix)
 ```
 
 ### Examples
@@ -47,9 +47,9 @@ $ memo
 ✅ Memo created at: /path/to/project/.sushichan044/memo/20251031/14-30-45.md
 /path/to/project/.sushichan044/memo/20251031/14-30-45.md
 
-# Create a named memo
+# Create a named memo (timestamp is always added as prefix)
 $ memo "sprint-planning"
-✅ Memo created at: /path/to/project/.sushichan044/memo/20251031/sprint-planning.md
+✅ Memo created at: /path/to/project/.sushichan044/memo/20251031/14-30-45-sprint-planning.md
 
 # Pipe the path to open in editor
 $ vim "$(memo 'quick-note')"
