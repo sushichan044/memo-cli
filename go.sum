@@ -2,10 +2,10 @@ github.com/Songmu/gitconfig v0.2.1 h1:cZsqELfMtxWVI8ovq17gbvsR4qLfoYLAiXy5GwtJWb
 github.com/Songmu/gitconfig v0.2.1/go.mod h1:XM4O3SoXFnli9Ql2G7qXK2Fg7LJwf7Hs8GLFEOJlzmM=
 github.com/alecthomas/assert/v2 v2.11.0 h1:2Q9r3ki8+JYXvGsDyBXwH3LcJ+WK5D0gc5E8vS6K3D0=
 github.com/alecthomas/assert/v2 v2.11.0/go.mod h1:Bze95FyfUr7x34QZrjL+XP+0qgp/zg8yS+TtBj1WA3k=
-github.com/alecthomas/kong v1.12.1 h1:iq6aMJDcFYP9uFrLdsiZQ2ZMmcshduyGv4Pek0MQPW0=
-github.com/alecthomas/kong v1.12.1/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
-github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
-github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
+github.com/alecthomas/kong v1.13.0 h1:5e/7XC3ugvhP1DQBmTS+WuHtCbcv44hsohMgcvVxSrA=
+github.com/alecthomas/kong v1.13.0/go.mod h1:wrlbXem1CWqUV5Vbmss5ISYhsVPkBb1Yo7YKJghju2I=
+github.com/alecthomas/repr v0.5.2 h1:SU73FTI9D1P5UNtvseffFSGmdNci/O6RsqzeXJtP0Qs=
+github.com/alecthomas/repr v0.5.2/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
 github.com/cli/go-gh/v2 v2.12.1 h1:SVt1/afj5FRAythyMV3WJKaUfDNsxXTIe7arZbwTWKA=
 github.com/cli/go-gh/v2 v2.12.1/go.mod h1:+5aXmEOJsH9fc9mBHfincDwnS02j2AIA/DsTH0Bk5uw=
 github.com/cli/safeexec v1.0.1 h1:e/C79PbXF4yYTN/wauC4tviMxEV13BwljGj0N9j+N00=
