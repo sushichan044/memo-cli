@@ -18,7 +18,6 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X main.revision={{.ShortCommit}}
 
 archives:
   - formats: [tar.gz]
@@ -46,6 +45,7 @@ changelog:
       - "^test:"
       - "^chore:"
       - "^ci:"
+  use: github-native
 
 release:
   use_existing_draft: true
