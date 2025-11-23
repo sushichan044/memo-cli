@@ -18,8 +18,6 @@ builds:
       - darwin
     ldflags:
       - -s -w
-    # Version information is automatically embedded via runtime/debug.ReadBuildInfo()
-    # No need to inject version/revision via ldflags
 
 archives:
   - formats: [tar.gz]
