@@ -47,6 +47,7 @@ changelog:
       - "^test:"
       - "^chore:"
       - "^ci:"
+  use: github-native
 
 release:
   use_existing_draft: true
