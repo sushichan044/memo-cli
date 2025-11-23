@@ -1,6 +1,7 @@
 package version_test
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
@@ -66,14 +67,7 @@ func TestGetVersionFormat(t *testing.T) {
 	// - "unknown" (edge case)
 
 	validFormats := []string{"dev", "unknown"}
-	isValid := false
-
-	for _, format := range validFormats {
-		if v == format {
-			isValid = true
-			break
-		}
-	}
+	isValid := slices.Contains(validFormats, v)
 
 	// Or starts with "v" (version tag)
 	if strings.HasPrefix(v, "v") {
