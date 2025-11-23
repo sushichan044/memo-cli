@@ -52,15 +52,10 @@ func (c *NewCmd) Run(ctx *CLIContext) error {
 	return nil
 }
 
-var (
-	//nolint:gochecknoglobals // This value is overridden by goreleaser.
-	revision = "dev"
-)
-
 func main() {
 	ctx := kong.Parse(&CLI{},
 		kong.Vars{
-			"version": fmt.Sprintf("memo-cli %s (rev: %s)", version.Version, revision),
+			"version": fmt.Sprintf("memo-cli %s", version.Get()),
 		},
 		kong.Name("memo"),
 		kong.Description("A CLI tool to create and manage markdown memos"),

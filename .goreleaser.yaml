@@ -18,7 +18,8 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X main.revision={{.ShortCommit}}
+    # Version information is automatically embedded via runtime/debug.ReadBuildInfo()
+    # No need to inject version/revision via ldflags
 
 archives:
   - formats: [tar.gz]
