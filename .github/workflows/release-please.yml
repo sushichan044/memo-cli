@@ -37,7 +37,8 @@ jobs:
           permission-pull-requests: write
           permission-issues: write
 
-      - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
+      # TODO: switch to official action when https://github.com/googleapis/release-please/pull/2627 is merged and released
+      - uses: Fanzzzd/release-please-action@release-with-force-tag
         id: release
         with:
           token: ${{ steps.app-token.outputs.token }}
