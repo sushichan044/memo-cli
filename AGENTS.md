@@ -4,166 +4,11 @@ This file provides guidance to Coding Agents when working with code in this repo
 
 ---
 
-## Project Context
-
-### Overview
-
-memo-cli is a Go CLI tool for creating and managing markdown memos with interactive selection capabilities. It provides a simple way to create timestamped or named markdown files organized by date, with built-in gitignore checking to help keep memos out of version control.
-
-### Architecture
-
-#### Core Structure
-
-```
-memo-cli/
-├── cmd/
-│   └── memo/           # CLI entry point (kong-based)
-│       └── main.go
-├── internal/
-│   ├── config/         # Configuration management
-│   │   ├── config.go   # Environment variable handling, default paths
-│   │   └── config_test.go
-│   ├── memo/           # Memo creation logic
-│   │   ├── memo.go     # File creation, normalization, gitignore checking
-│   │   └── memo_test.go
-│   ├── xdg/            # XDG Base Directory specification support
-│   │   └── xdg.go      # User data directory resolution
-│   └── gitignore/      # Gitignore pattern matching
-│       ├── matcher.go  # Pattern matching engine
-│       └── path.go     # Path resolution for gitignore files
-```
-
-### Key Features
-
-1. **Memo Creation**: Create markdown files with timestamp or custom names
-2. **Date Organization**: Automatic YYYYMMDD directory structure
-3. **Filename Normalization**: Safe filename generation (slash/space → dash, extension removal)
-4. **Gitignore Integration**: Checks if memo directory is ignored, shows helpful warnings
-5. **Cross-platform**: Supports Linux, macOS, and Windows
-
-### Planned Features
-
-These features are planned for future implementation:
-
-1. **Interactive Selection** (`memo list` command)
-   - Fuzzy finder (go-fuzzyfinder) with file preview
-   - Browse and select from existing memos
-   - Real-time preview window showing memo content
-   - Implementation tracked in: `cmd/memo/main.go` (TODO comment)
-
-2. **Environment Customization**
-   - `MEMO_BASE_DIR` environment variable for custom base directory
-   - Flexible directory structure configuration
-   - Implementation tracked in: `internal/config/config.go` (TODO comment)
-
-3. **UI Package** (`internal/ui/`)
-   - Dedicated package for interactive selection features
-   - Fuzzyfinder integration and wrapper utilities
-   - Will be created when implementing the `memo list` command
-
-### Dependencies
-
-#### Core Dependencies
-
-- **github.com/alecthomas/kong** v1.12.1 - CLI parser with type-safe argument handling
-- **github.com/spf13/pathologize** - Filename normalization and path sanitization
-- **github.com/Songmu/gitconfig** v0.2.1 - Git configuration parsing
-- **github.com/sabhiram/go-gitignore** - Gitignore pattern matching engine
-
-#### Testing Dependencies
-
-- **github.com/stretchr/testify** v1.11.1 - Assertion library for unit tests
-
-#### Future Dependencies (Planned)
-
-- **github.com/ktr0731/go-fuzzyfinder** - Interactive fuzzy finder for `memo list` command
-
-### Design Decisions
-
-#### User-specific Directory Structure
-
-- **Decision**: Use `.{username}/memo` as default path
-- **Rationale**: Avoids hardcoding usernames, supports multiple users
-- **Fallback**: `.memo/memo` when username cannot be determined
-
-#### Gitignore Warning (Non-blocking)
-
-- **Decision**: Warn but don't block when memo directory is not ignored
-- **Rationale**: Better UX, lets users decide their own workflow
-- **Implementation**: Uses existing `internal/gitignore.Matcher`
-
-#### System Timezone
-
-- **Decision**: Use system timezone for all timestamps
-- **Rationale**: Simplicity, matches user's local time
-- **Alternative Considered**: `MEMO_TIMEZONE` environment variable (deferred)
-
-#### Output Format
-
-- **stdout**: File path (pipeable to other commands)
-- **stderr**: Human-readable messages and warnings
-- **Rationale**: Follows Unix convention for tool composition
-
-#### CLI Parser
-
-- **Decision**: kong (github.com/alecthomas/kong)
-- **Rationale**: Type-safe, minimal boilerplate, excellent help generation
-
----
-
-## Development Environment
-
-### Runtime & Package Manager
-
-- **Go Version**: 1.24.0 or later (toolchain: go1.25.1)
-- **Task Runner**: mise
-
-### Code Quality Tools
-
-#### Linter
-
-- **Tool**: golangci-lint v2.1.5
-- **Configuration**: `.golangci.yml`
-- **Settings**:
-  - Timeout: 5 minutes
-  - Maximum line length: 120 characters
-  - 80+ linters enabled including security checks (gosec), code complexity analysis, and strict formatting rules
-
-#### Formatter
-
-- **Tools**: goimports, golines, gci (via golangci-lint)
-- **Auto-fix**: Available via `mise run lint-fix`
-
-### Testing
-
-- **Test Runner**: gotestsum v1.12.2 (enhanced output wrapper around standard Go testing)
-- **Assertion Library**: github.com/stretchr/testify v1.11.1
-- **Standard Commands**: `go test ./...` also supported
-
-### Build
-
-- **Build System**: goreleaser v2
-- **Configuration**: `.goreleaser.yaml`
-- **Supported Platforms**:
-  - Linux (x86_64, i386, ARM variants)
-  - Windows (via ZIP archives)
-  - macOS (universal binaries with ARM64 support)
-- **Packaging**: tar.gz for Unix, ZIP for Windows
-- **Pre-build Hooks**: `go mod tidy`, `go generate ./...`
-
-### Package Publishing
-
-- **Release Platform**: GitHub Releases
-- **Distribution**: Homebrew Tap (sushichan044/homebrew-tap)
-- **Checksum**: Automatically generated for all artifacts
-- **Version Management**: svu (semantic versioning utility)
-
-### Available Scripts
+## Quick Commands
 
 ```bash
 mise run dev                # Run in development mode
 mise run test               # Run tests using gotestsum
-mise run test-coverage      # Run tests with coverage reporting
 mise run lint               # Run golangci-lint for code quality checks
 mise run lint-fix           # Auto-fix linting issues
 mise run fmt                # Format code
@@ -178,19 +23,18 @@ go test ./...               # Run all tests
 go mod tidy                 # Clean up dependencies
 ```
 
-### Development Workflow
+## Project Context
 
-1. **Code**: Write Go code following golangci-lint rules (120 char line limit)
-2. **Test**: Run `mise run test` or `go test ./...`
-3. **Lint**: Ensure code passes `mise run lint` (80+ linters)
-4. **Format**: Auto-format with `mise run fmt` or `mise run lint-fix`
-5. **Build**: Test cross-platform builds with `mise run build-snapshot`
-6. **Release**: Managed via goreleaser with GitHub Releases and Homebrew Tap
+memo-cli is a Go CLI tool for creating and managing markdown memos.
 
-### Key Constraints
+## Sources of Truth
 
-- **Minimum Go Version**: 1.24.0 required
-- **Gitignore Compliance**: All file operations respect Git ignore rules (global and local)
-- **Error Isolation**: Individual file processing errors don't halt entire operations
-- **Concurrency Safety**: All concurrent operations use semaphore-based control
-- **Cross-platform**: Must support Linux, Windows, and macOS
+Keep this file light. For implementation details, refer to:
+
+- Product and usage overview: `README.md`
+- CLI entry point: `cmd/memo/main.go`
+- Package layout and behavior: `internal/`
+- Dependencies and versions: `go.mod`, `go.sum`
+- Task runner and scripts: `mise.toml`
+- Lint/format rules: `.golangci.yml`
+- Release/build configuration: `.goreleaser.yaml`
