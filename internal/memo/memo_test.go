@@ -6,6 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/sushichan044/memo-cli/internal/config"
 	"github.com/sushichan044/memo-cli/internal/memo"
 )
@@ -45,7 +48,7 @@ func TestNormalizeFileName(t *testing.T) {
 			cfg := &config.Config{BaseDir: tmpDir}
 			creator := memo.New(cfg)
 
-			path, err := creator.Create(tt.input)
+			path, err := creator.Create(tt.input, "")
 			if err != nil {
 				t.Fatalf("Create() failed: %v", err)
 			}
@@ -69,7 +72,7 @@ func TestCreate_WithName(t *testing.T) {
 	creator := memo.New(cfg)
 
 	// Create memo with custom name
-	path, err := creator.Create("test-memo")
+	path, err := creator.Create("test-memo", "")
 	if err != nil {
 		t.Fatalf("Create() failed: %v", err)
 	}
@@ -107,6 +110,87 @@ func TestCreate_WithName(t *testing.T) {
 	}
 }
 
+func TestCreate_WithExtension(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := &config.Config{
+		BaseDir: tmpDir,
+	}
+
+	creator := memo.New(cfg)
+
+	path, err := creator.Create("test-memo", "txt")
+	require.NoError(t, err, "Create() should succeed")
+	require.FileExists(t, path, "File should be created")
+
+	// Check extension
+	filename := filepath.Base(path)
+	assert.True(t, strings.HasSuffix(filename, ".txt"),
+		"Filename %q should end with .txt", filename)
+}
+
+func TestCreate_InvalidExtension(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := &config.Config{
+		BaseDir: tmpDir,
+	}
+
+	creator := memo.New(cfg)
+
+	if _, err := creator.Create("test", "md/evil"); err == nil {
+		t.Fatal("Create() should fail with invalid extension")
+	}
+}
+
+func TestCreate_ExtensionNormalization(t *testing.T) {
+	tests := []struct {
+		name    string
+		ext     string
+		want    string
+		wantErr bool
+	}{
+		{"default on empty", "", "md", false},
+		{"strips leading dot", ".txt", "txt", false},
+		{"lowercases", "MD", "md", false},
+		{"trims whitespace", "  txt  ", "txt", false},
+		{"allows dash", "my-ext", "my-ext", false},
+		{"allows underscore", "my_ext", "my_ext", false},
+		{"allows numbers", "ext2", "ext2", false},
+		{"rejects slash", "md/evil", "", true},
+		{"rejects backslash", "md\\evil", "", true},
+		{"rejects semicolon", "md;sh", "", true},
+		{"rejects null byte", "md\x00", "", true},
+		{"rejects space", "md sh", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpDir := t.TempDir()
+			cfg := &config.Config{
+				BaseDir: tmpDir,
+			}
+			creator := memo.New(cfg)
+
+			path, err := creator.Create("test", tt.ext)
+
+			if tt.wantErr {
+				require.Error(t, err, "Create() should fail with invalid extension")
+				assert.Contains(t, err.Error(), "invalid extension",
+					"Error should mention invalid extension")
+			} else {
+				require.NoError(t, err, "Create() should succeed")
+				require.FileExists(t, path, "File should be created")
+
+				filename := filepath.Base(path)
+				expectedExt := "." + tt.want
+				assert.True(t, strings.HasSuffix(filename, expectedExt),
+					"Filename %q should end with %q", filename, expectedExt)
+			}
+		})
+	}
+}
+
 func TestCreate_WithoutName(t *testing.T) {
 	// Create temporary directory
 	tmpDir := t.TempDir()
@@ -118,7 +202,7 @@ func TestCreate_WithoutName(t *testing.T) {
 	creator := memo.New(cfg)
 
 	// Create memo without name (should use timestamp)
-	path, err := creator.Create("")
+	path, err := creator.Create("", "")
 	if err != nil {
 		t.Fatalf("Create() failed: %v", err)
 	}
@@ -156,7 +240,7 @@ func TestCreate_DirectoryCreation(t *testing.T) {
 	creator := memo.New(cfg)
 
 	// Create memo (should create directories)
-	path, err := creator.Create("test")
+	path, err := creator.Create("test", "")
 	if err != nil {
 		t.Fatalf("Create() failed: %v", err)
 	}
@@ -217,7 +301,7 @@ func TestGenerateFilename(t *testing.T) {
 			cfg := &config.Config{BaseDir: tmpDir}
 			creator := memo.New(cfg)
 
-			path, err := creator.Create(tt.input)
+			path, err := creator.Create(tt.input, "")
 			if err != nil {
 				t.Fatalf("Create() failed: %v", err)
 			}

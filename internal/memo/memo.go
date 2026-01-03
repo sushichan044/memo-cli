@@ -23,13 +23,18 @@ func New(cfg *config.Config) *Creator {
 	return &Creator{config: cfg}
 }
 
-// Create creates a new memo file with the given name.
+// Create creates a new memo file with the given name and extension.
 // If name is empty, uses timestamp (HH-MM-SS) as filename.
 // Returns the absolute path to the created file.
-func (c *Creator) Create(name string) (string, error) {
+func (c *Creator) Create(name, ext string) (string, error) {
 	// Ensure base directory exists
 	if err := os.MkdirAll(c.config.BaseDir, 0o750); err != nil {
 		return "", fmt.Errorf("failed to create base directory: %w", err)
+	}
+
+	normalizedExt, err := normalizeExtension(ext)
+	if err != nil {
+		return "", err
 	}
 
 	// Generate filename
@@ -40,12 +45,12 @@ func (c *Creator) Create(name string) (string, error) {
 	dateDir := now.Format("20060102")
 	fullDir := filepath.Join(c.config.BaseDir, dateDir)
 
-	if err := os.MkdirAll(fullDir, 0o750); err != nil {
-		return "", fmt.Errorf("failed to create date directory: %w", err)
+	if mkdirErr := os.MkdirAll(fullDir, 0o750); mkdirErr != nil {
+		return "", fmt.Errorf("failed to create date directory: %w", mkdirErr)
 	}
 
 	// Create file path
-	filePath := filepath.Join(fullDir, filename+".md")
+	filePath := filepath.Join(fullDir, filename+"."+normalizedExt)
 
 	// Create empty file
 	file, err := os.Create(filePath)
@@ -113,4 +118,22 @@ func normalizeFileName(name string) string {
 	normalized = rep.Replace(normalized)
 
 	return normalized
+}
+
+func normalizeExtension(ext string) (string, error) {
+	trimmed := strings.TrimSpace(ext)
+	trimmed = strings.TrimPrefix(trimmed, ".")
+	if trimmed == "" {
+		return "md", nil
+	}
+
+	normalized := strings.ToLower(trimmed)
+	for _, r := range normalized {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' || r == '_' {
+			continue
+		}
+		return "", fmt.Errorf("invalid extension: %q", ext)
+	}
+
+	return normalized, nil
 }
