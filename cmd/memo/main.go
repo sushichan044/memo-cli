@@ -24,7 +24,8 @@ type (
 	}
 
 	NewCmd struct {
-		Name string `arg:"" optional:"" help:"Memo name (default: timestamp HH-MM-SS)"`
+		Name string `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
+		Ext  string `                   help:"Memo file extension"           short:"e" default:"md"`
 	}
 )
 
@@ -37,7 +38,7 @@ func (c *NewCmd) Run(ctx *CLIContext) error {
 		fmt.Fprintln(os.Stderr) // blank line
 	}
 
-	path, err := creator.Create(c.Name)
+	path, err := creator.Create(c.Name, c.Ext)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		return err
