@@ -45,9 +45,8 @@ func (c *Creator) Create(name, ext string) (string, error) {
 	dateDir := now.Format("20060102")
 	fullDir := filepath.Join(c.config.BaseDir, dateDir)
 
-	err = os.MkdirAll(fullDir, 0o750)
-	if err != nil {
-		return "", fmt.Errorf("failed to create date directory: %w", err)
+	if mkdirErr := os.MkdirAll(fullDir, 0o750); mkdirErr != nil {
+		return "", fmt.Errorf("failed to create date directory: %w", mkdirErr)
 	}
 
 	// Create file path
