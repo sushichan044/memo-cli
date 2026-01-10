@@ -24,15 +24,17 @@ type (
 	}
 
 	NewCmd struct {
-		Name      string `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
-		Ext       string `                   help:"Memo file extension"           short:"e" default:"md"`
-		Directory bool   `                   help:"Create a directory instead of a file" short:"d"`
+		Name      string  `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
+		Ext       *string `                   help:"Memo file extension"           short:"e" default:"md"`
+		Directory bool    `                   help:"Create a directory instead of a file" short:"d"`
 	}
 )
 
+const defaultExt = "md"
+
 func (c *NewCmd) Run(ctx *CLIContext) error {
 	// Validate that --directory and --ext are not used together
-	if c.Directory && c.Ext != "md" {
+	if c.Directory && c.Ext != nil {
 		return fmt.Errorf("cannot use --directory and --ext together")
 	}
 
@@ -51,8 +53,13 @@ func (c *NewCmd) Run(ctx *CLIContext) error {
 		// Create directory instead of file
 		path, err = creator.CreateDirectory(c.Name)
 	} else {
+		// Determine extension: use explicitly provided value or default
+		ext := defaultExt
+		if c.Ext != nil {
+			ext = *c.Ext
+		}
 		// Create file as usual
-		path, err = creator.Create(c.Name, c.Ext)
+		path, err = creator.Create(c.Name, ext)
 	}
 
 	if err != nil {
