@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -24,12 +25,20 @@ type (
 	}
 
 	NewCmd struct {
-		Name string `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
-		Ext  string `                   help:"Memo file extension"           short:"e" default:"md"`
+		Name      string  `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
+		Ext       *string `                   help:"Memo file extension"                  short:"e"`
+		Directory bool    `                   help:"Create a directory instead of a file" short:"d"`
 	}
 )
 
+const defaultExt = "md"
+
 func (c *NewCmd) Run(ctx *CLIContext) error {
+	// Validate that --directory and --ext are not used together
+	if c.Directory && c.Ext != nil {
+		return errors.New("cannot use --directory and --ext together")
+	}
+
 	creator := memo.New(ctx.cfg)
 
 	// Check gitignore and print warning if needed
@@ -38,14 +47,33 @@ func (c *NewCmd) Run(ctx *CLIContext) error {
 		fmt.Fprintln(os.Stderr) // blank line
 	}
 
-	path, err := creator.Create(c.Name, c.Ext)
+	var path string
+	var err error
+
+	if c.Directory {
+		// Create directory instead of file
+		path, err = creator.CreateDirectory(c.Name)
+	} else {
+		// Determine extension: use explicitly provided value or default
+		ext := defaultExt
+		if c.Ext != nil {
+			ext = *c.Ext
+		}
+		// Create file as usual
+		path, err = creator.Create(c.Name, ext)
+	}
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		return err
 	}
 
 	// Output success message to stderr
-	fmt.Fprintf(os.Stderr, "✅ Memo created at: %s\n", path)
+	if c.Directory {
+		fmt.Fprintf(os.Stderr, "✅ Directory created at: %s\n", path)
+	} else {
+		fmt.Fprintf(os.Stderr, "✅ Memo created at: %s\n", path)
+	}
 
 	// Output path to stdout (for piping)
 	fmt.Println(path) //nolint:forbidigo // stdout output is intentional for piping

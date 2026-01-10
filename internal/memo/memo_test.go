@@ -358,3 +358,73 @@ func TestCheckGitignore(t *testing.T) {
 	// Just check that it doesn't panic
 	t.Logf("CheckGitignore() returned: %q", warning)
 }
+
+func TestCreateDirectory_WithName(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := &config.Config{
+		BaseDir: tmpDir,
+	}
+
+	creator := memo.New(cfg)
+
+	// Create directory with custom name
+	path, err := creator.CreateDirectory("test-directory")
+	require.NoError(t, err, "CreateDirectory() should succeed")
+
+	// Check that directory exists
+	info, err := os.Stat(path)
+	require.NoError(t, err, "Directory should exist")
+	assert.True(t, info.IsDir(), "Path should be a directory")
+
+	// Check directory name format (should be HH-MM-SS-test-directory)
+	dirname := filepath.Base(path)
+	assert.True(t, strings.HasSuffix(dirname, "-test-directory"),
+		"Directory name %q should end with -test-directory", dirname)
+
+	// Verify timestamp prefix format (HH-MM-SS-)
+	nameWithoutSuffix := strings.TrimSuffix(dirname, "-test-directory")
+	parts := strings.Split(nameWithoutSuffix, "-")
+	const expectedParts = 3 // HH-MM-SS
+	assert.Len(t, parts, expectedParts,
+		"Timestamp prefix %q should have format HH-MM-SS", nameWithoutSuffix)
+
+	// Check that directory is under tmpDir
+	assert.True(t, strings.HasPrefix(path, tmpDir),
+		"Path %q should be under %q", path, tmpDir)
+
+	// Check directory structure (should have YYYYMMDD parent directory)
+	parentDir := filepath.Dir(path)
+	dateDir := filepath.Base(parentDir)
+	const expectedDirLen = 8 // YYYYMMDD
+	assert.Len(t, dateDir, expectedDirLen,
+		"Date directory %q should be 8 characters (YYYYMMDD)", dateDir)
+}
+
+func TestCreateDirectory_WithoutName(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cfg := &config.Config{
+		BaseDir: tmpDir,
+	}
+
+	creator := memo.New(cfg)
+
+	// Create directory without name (should use timestamp)
+	path, err := creator.CreateDirectory("")
+	require.NoError(t, err, "CreateDirectory() should succeed")
+
+	// Check that directory exists
+	info, err := os.Stat(path)
+	require.NoError(t, err, "Directory should exist")
+	assert.True(t, info.IsDir(), "Path should be a directory")
+
+	// Check directory name format (should be HH-MM-SS)
+	dirname := filepath.Base(path)
+
+	// Should be in format HH-MM-SS (8 characters with dashes)
+	parts := strings.Split(dirname, "-")
+	const expectedParts = 3 // HH-MM-SS
+	assert.Len(t, parts, expectedParts,
+		"Timestamp directory name %q should have format HH-MM-SS", dirname)
+}

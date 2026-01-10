@@ -62,6 +62,38 @@ func (c *Creator) Create(name, ext string) (string, error) {
 	return filePath, nil
 }
 
+// CreateDirectory creates a new memo directory with the given name.
+// If name is empty, uses timestamp (HH-MM-SS) as directory name.
+// Returns the absolute path to the created directory.
+func (c *Creator) CreateDirectory(name string) (string, error) {
+	// Ensure base directory exists
+	if err := os.MkdirAll(c.config.BaseDir, 0o750); err != nil {
+		return "", fmt.Errorf("failed to create base directory: %w", err)
+	}
+
+	// Generate directory name
+	dirname := normalizeFileName(c.generateFilename(name))
+
+	// Create date directory (YYYYMMDD)
+	now := time.Now()
+	dateDir := now.Format("20060102")
+	fullDir := filepath.Join(c.config.BaseDir, dateDir)
+
+	if mkdirErr := os.MkdirAll(fullDir, 0o750); mkdirErr != nil {
+		return "", fmt.Errorf("failed to create date directory: %w", mkdirErr)
+	}
+
+	// Create directory path
+	dirPath := filepath.Join(fullDir, dirname)
+
+	// Create directory
+	if err := os.MkdirAll(dirPath, 0o750); err != nil {
+		return "", fmt.Errorf("failed to create memo directory: %w", err)
+	}
+
+	return dirPath, nil
+}
+
 // generateFilename creates a normalized filename from user input.
 // If name is empty, uses timestamp (HH-MM-SS).
 // Otherwise, normalizes the name by:
