@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -25,7 +26,7 @@ type (
 
 	NewCmd struct {
 		Name      string  `arg:"" optional:"" help:"Memo name (default: HH-MM-SS)"`
-		Ext       *string `                   help:"Memo file extension"           short:"e" default:"md"`
+		Ext       *string `                   help:"Memo file extension"                  short:"e"`
 		Directory bool    `                   help:"Create a directory instead of a file" short:"d"`
 	}
 )
@@ -35,7 +36,7 @@ const defaultExt = "md"
 func (c *NewCmd) Run(ctx *CLIContext) error {
 	// Validate that --directory and --ext are not used together
 	if c.Directory && c.Ext != nil {
-		return fmt.Errorf("cannot use --directory and --ext together")
+		return errors.New("cannot use --directory and --ext together")
 	}
 
 	creator := memo.New(ctx.cfg)
