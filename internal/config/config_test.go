@@ -67,8 +67,6 @@ func TestGetIgnorePattern(t *testing.T) {
 
 func TestMemoRootDirEnv(t *testing.T) {
 	dir := t.TempDir()
-
-	// Set environment variable
 	t.Setenv("MEMO_ROOT_DIR", dir)
 
 	cfg, err := config.New()
