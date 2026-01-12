@@ -59,6 +59,17 @@ $ vim "$(memo 'quick-note')"
 # Interactive fuzzy finder with preview
 ```
 
+## Configuration
+
+### Custom Memo Base Directory
+
+You can set a custom base directory for your memos by defining the `MEMO_ROOT_DIR` environment variable. Make sure to use an absolute path.
+
+```bash
+MEMO_ROOT_DIR="/path/to/your/custom/memos" memo new "custom-note"
+# This will create the memo in /path/to/your/custom/memos/YYYYMMDD/
+```
+
 ## Gitignore Integration
 
 The tool checks if your memo directory is ignored by git and displays a warning if not.
