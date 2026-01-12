@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 const (
 	// fallbackMemoDir is the default directory name when username cannot be determined.
 	fallbackMemoDir = "memo"
+
+	memoRootDirEnv = "MEMO_ROOT_DIR"
 )
 
 // Config holds the configuration for the memo CLI.
@@ -18,7 +21,7 @@ type Config struct {
 }
 
 // New creates a new Config instance.
-// It reads the MEMO_BASE_DIR environment variable.
+// It checks the MEMO_ROOT_DIR environment variable for custom base directory.
 // If not set, it uses the current directory with .{username}/memo structure.
 // If username cannot be determined, it falls back to .memo/memo.
 func New() (*Config, error) {
@@ -32,6 +35,13 @@ func New() (*Config, error) {
 }
 
 func getBaseDir() (string, error) {
+	if envDir := os.Getenv(memoRootDirEnv); envDir != "" {
+		if !filepath.IsAbs(envDir) {
+			return "", errors.New(memoRootDirEnv + " must be an absolute path")
+		}
+		return envDir, nil
+	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		return "", err

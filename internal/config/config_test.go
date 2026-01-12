@@ -47,7 +47,6 @@ func TestGetIgnorePattern(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &config.Config{BaseDir: tt.baseDir}
 			pattern, err := cfg.GetIgnorePattern()
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetIgnorePattern() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -63,6 +62,20 @@ func TestGetIgnorePattern(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestMemoRootDirEnv(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("MEMO_ROOT_DIR", dir)
+
+	cfg, err := config.New()
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
+
+	if cfg.BaseDir != dir {
+		t.Errorf("BaseDir = %q; want %q", cfg.BaseDir, dir)
 	}
 }
 
